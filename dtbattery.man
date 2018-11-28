@@ -1,0 +1,16 @@
+.TH DTBATTERY 1
+.SH NAME
+dtbattery \- battery level indicator for Linux 4.x and CDE
+.SH SYNOPSIS
+.B dtbattery.ds
+.SH DESCRIPTION
+.B dtbattery
+monitors the files under \fB /sys/class/power_supply/ \fR
+and displays every 10s battery charge, voltage, capacity and remaining
+time when the adapter is absent. When an adapter is present, only the
+charge and voltage are shown.
+.SH LIMITATIONS
+.B dtbattery
+handles only a single battery BAT0. It only displays the number of
+hours remaining when the battery is discharging, and does not generate
+alarms when the battery is nearly empty.

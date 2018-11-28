@@ -1,0 +1,97 @@
+#!/usr/dt/bin/dtksh
+# displays battery level on Linux 4.x in the
+# Common Desktop Environment 
+
+
+batcheck() {
+read btype </sys/class/power_supply/BAT0/technology 
+read charge < /sys/class/power_supply/BAT0/charge_now
+charge=$(($charge/1000))
+read voltage < /sys/class/power_supply/BAT0/voltage_now
+voltage=$(($voltage*1,0e-6))
+read current < /sys/class/power_supply/BAT0/current_now
+current=$(($current/1000))
+read capacity < /sys/class/power_supply/BAT0/capacity 
+read etat < /sys/class/power_supply/BAT0/status
+read adapter < /sys/class/power_supply/AC/online
+if [ $current -gt 0 ];  then time=$((charge/current)) 
+   else
+       time='Unknown'
+fi
+XmTextSetString $TEXT0 $btype
+XmTextSetString $TEXT1 $charge
+XmTextSetString $TEXT3 $voltage
+XmTextSetString $TEXT2 $capacity
+XmTextSetString $TEXT4 $etat
+XmTextSetString $TEXT5 $time
+XmTextSetString $TEXT6 $adapter
+# We will use the current to find 
+# the remaining time while on battery/charging. 
+# We use XtAddTimeOut to call batcheck again in 10s 
+XtAddTimeOut BATTERY 10000 "batcheck;"
+}
+
+XtInitialize TOPLEVEL text TExt "$0" "$@"
+
+XtCreateManagedWidget FORM form XmForm $TOPLEVEL \
+    marginHeight:15 \
+    marginWidth:15
+
+
+
+# We don't have an exit button, since it is better that the
+# program remains active during the whole session. 
+
+
+# We create a 2 column Row/Column Widget
+XmCreateRowColumn RW0 $FORM rw0 numColumns:2 packing:PACK_COLUMN
+# We start the loop to check the battery
+
+
+# We fill the left column with the labels
+XmCreateLabel LABEL0 $RW0 "label0" labelString:"Battery type:"
+XmCreateLabel LABEL1 $RW0 "label1" labelString:"Charge Now (mAh):"
+XmCreateLabel LABEL2 $RW0 "label2" labelString:"Capacity (%):"
+XmCreateLabel LABEL3 $RW0 "label3" labelString:"Voltage (V):"
+XmCreateLabel LABEL4 $RW0 "label4" labelString:"State:"
+XmCreateLabel LABEL5 $RW0 "label5" labelString:"Time Remaining (h)"
+XmCreateLabel LABEL6 $RW0 "label6" labelString:"AC-Adapter:" 
+btype='Unknown'
+charge='50'
+capacity='Unknown'
+voltage='Unknown'
+etat='Unknown'
+adapter='Unknown'
+time='Unknown' 
+#Now we fill right column with values 
+
+XmCreateTextField TEXT0 $RW0 "text0" editable:false value:$btype
+XmCreateTextField TEXT1 $RW0 "text1" editable:false value:$charge
+XmCreateTextField TEXT2 $RW0 "text2" editable:false value:$capacity
+XmCreateTextField TEXT3 $RW0 "text3" editable:false value:$voltage
+XmCreateTextField TEXT4 $RW0 "text4" editable:false value:$etat
+XmCreateTextField TEXT5 $RW0 "text5" editable:false value:$time
+XmCreateTextField TEXT6 $RW0 "text6" editable:false value:$adapter
+batcheck 
+# Mandatory if we don't use XtCreateManagedWidget to make window visible 
+XtManageChild $RW0
+# Make the labels visible
+XtManageChild $LABEL0
+XtManageChild $LABEL1
+XtManageChild $LABEL2
+XtManageChild $LABEL3
+XtManageChild $LABEL4
+XtManageChild $LABEL5
+XtManageChild $LABEL6
+# Make the data visible 
+XtManageChild $TEXT0
+XtManageChild $TEXT1 
+XtManageChild $TEXT2
+XtManageChild $TEXT3
+XtManageChild $TEXT4
+XtManageChild $TEXT5
+XtManageChild $TEXT6
+# Enter the Xt loop 
+XtRealizeWidget $TOPLEVEL
+XtMainLoop
+

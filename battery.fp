@@ -1,0 +1,11 @@
+CONTROL Battery
+{
+TYPE client
+CONTAINER_NAME Top
+CONTAINER_TYPE BOX
+CLIENT_NAME battery
+CLIENT_GEOMETRY 97x58
+HELP_STRING "Battery indicator" 
+}
+
+

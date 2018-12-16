@@ -1,0 +1,35 @@
+#!/usr/dt/bin/dtksh
+# Battery level monitor, embbedable in the CDE front panel 
+# Hommage aux deuxligneurs de l'HHHHHHHebdo 
+batcheck() {
+# The following line is specific of Linux 4.x 
+read capacity < /sys/class/power_supply/BAT0/capacity
+XmScaleSetValue $SCALE $capacity
+
+XtAddTimeOut BATTERY 10000 "batcheck;"
+}
+
+XtInitialize TOPLEVEL battery Battery "$0" "$@"
+
+XtCreateManagedWidget FORM form XmForm $TOPLEVEL \
+    marginHeight:15 \
+    marginWidth:15
+
+                 
+XmCreateScale SCALE $FORM scale showValue:NEAR_BORDER orientation:HORIZONTAL scaleHeight:8 scaleWidth:97 editable:false slidingMode:SLIDER sliderMark:THUMB_MARK minimum:0 maximum:100 titleString:"Battery (%)"
+
+batcheck
+
+
+
+# This is necessary when we don't use XtCreateManagedWidget
+XtManageChild $SCALE
+XtRealizeWidget $TOPLEVEL
+XtMainLoop
+
+# To port to FreeBSD, the line with read < /sys/class etc...
+# should be replaced with capacity=`acpicontrol -i 0 | grep/sed/awk etc... `
+# With FreeBSD use capacity=`envstat -s "acpibat0:charge" | grep etc... ` 
+# With OpenBSD sysctl should be used
+# With Solaris/Openindiana prtdiag may be the right command 
+

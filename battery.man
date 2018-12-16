@@ -1,0 +1,21 @@
+.TH BATTERY 1
+.SH NAME
+battery \- Linux 4.x battery level indicator for the CDE front panel
+.SH SYNOPSIS
+.B battery
+.SH DESCRIPTION
+.B battery
+monitors the file under \fB /sys/class/power_supply/BAT0/capacity\fR
+and displays every 10s battery capacity using an \fB XmScale(3)\fR
+widget. It can be embedded in the CDE front panel by placing the file
+.I battery.fp
+in the directory \fB $HOME/.dt/types \fR (personal installation) or in
+the directory \fB /etc/dt/appconfig/types/$LANG/ \fR (system wide
+installation).    
+.SH LIMITATIONS
+.B battery
+handles only a single battery BAT0. It only displays the battery
+level, and takes no action when the battery is nearly empty.
+.SH SEE ALSO
+.B dtbattery(1)
+

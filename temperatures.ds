@@ -1,0 +1,72 @@
+#! /usr/dt/bin/dtksh
+
+# Procedure to update the temperatures
+# they are read from tempN_input 
+tempcheck() { 
+
+read a < /sys/class/hwmon/hwmon2/temp2_input
+a=$((a/1000))
+XmScaleSetValue $SCALE0 $a
+
+read a < /sys/class/hwmon/hwmon2/temp3_input
+a=$((a/1000)) 
+XmScaleSetValue $SCALE1 $a
+
+read a < /sys/class/hwmon/hwmon2/temp4_input
+a=$((a/1000))
+XmScaleSetValue $SCALE2 $a 
+
+read a < /sys/class/hwmon/hwmon2/temp4_input
+a=$((a/1000)) 
+XmScaleSetValue $SCALE3 $a 
+
+read a < /sys/class/hwmon/hwmon0/temp1_input
+a=$((a/1000)) 
+XmScaleSetValue $SCALE4 $a
+
+read a < /sys/class/hwmon/hwmon1/temp1_input
+a=$((a/1000)) 
+XmScaleSetValue $SCALE5 $a
+
+XtAddTimeOut TEMPERATURE 10000 "tempcheck;"
+}
+ 
+
+XtInitialize TOPLEVEL text TExt "$0" "$@"
+
+XtCreateManagedWidget FORM form XmForm $TOPLEVEL \
+    marginHeight:15 \
+    marginWidth:15
+
+
+# We create a 6 column Row/Column Widget
+
+XmCreateRowColumn RW0 $FORM numColumns:6 orientation:HORIZONTAL packing:PACK_COLUMN 
+
+#We fill our Row/Column Widget with thermometers
+# We are assuming a CPU with 4 cores and 2 other temperature monitors
+# The CPU temperature monitors are under /sys/class/hwmon/hwmon2 
+# The other temperature monitors are under /sys/class/hwmon/hwmon[0-1]
+
+XmCreateScale SCALE0 $RW0 "ech1" slidingMode:THERMOMETER showValue:true orientation:VERTICAL editable:false minimum:0 maximum:105 titleString:"Core 1 (°C)"
+XmCreateScale SCALE1 $RW0 "ech2" slidingMode:THERMOMETER showValue:true orientation:VERTICAL editable:false minimum:0 maximum:105 titleString:"Core 2 (°C)"
+XmCreateScale SCALE2 $RW0 "ech3" slidingMode:THERMOMETER showValue:true orientation:VERTICAL editable:false minimum:0 maximum:105 titleString:"Core 3 (°C)"
+XmCreateScale SCALE3 $RW0 "ech4" slidingMode:THERMOMETER showValue:true orientation:VERTICAL editable:false minimum:0 maximum:105 titleString:"Core 4 (°C)"
+read b</sys/class/hwmon/hwmon0/name
+XmCreateScale SCALE4 $RW0 "ech5" slidingMode:THERMOMETER showValue:true orientation:VERTICAL editable:false minimum:0 maximum:105 titleString:$b" (°C)" 
+read b</sys/class/hwmon/hwmon1/name
+XmCreateScale SCALE5 $RW0 "ech6" slidingMode:THERMOMETER showValue:true orientation:VERTICAL editable:false minimum:0 maximum:105 titleString:$b" (°C)" 
+
+tempcheck
+ 
+XtManageChild $RW0
+XtManageChild $SCALE0
+XtManageChild $SCALE1
+XtManageChild $SCALE2
+XtManageChild $SCALE3
+XtManageChild $SCALE4
+XtManageChild $SCALE5
+
+XtRealizeWidget $TOPLEVEL
+XtMainLoop
+

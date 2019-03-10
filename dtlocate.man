@@ -1,0 +1,31 @@
+.TH DTLOCATE 1
+.SH NAME
+dtlocate \- file search utility for the Common Desktop Environment
+.SH SYNOPSIS
+.B dtlocate
+.SH DESCRIPTION
+.B dtlocate
+shows a text entry field to enter the name of the file or directory to be search
+and three checkboxes to decide whether the search should be case
+insensitive or sensitive, whether accents in the filename should be
+ignored or not, and whether the search in on the full filename or only
+the basename. After pressing enter, the results of the search are
+shown in a list with a vertical scrollbar on the right. It is possible
+to select a single filename in the list and use the drag and drop
+mechanism of CDE to transfer it to a \fB dtterm(1)\fR  or \fB dtpad(1)
+\fR window. Clicking on New Search starts a new search, on Quit leaves
+the application. 
+.SH LIMITATIONS
+.B dtlocate
+is a simple wrapper around the \fB locate(1) \fR command. If the
+database used by \fB locate(1) \fR has not been updated, it will find
+files that don't exist anymore on the system. In the present version
+of \fB dtlocate \fR, regular expression searches are not yet
+implemented.
+.SH BUGS
+When the search is completed, the window does not resize itself after
+the creation of the list. If some paths are very long, it is necessary
+to resize manually the window to be able to read them. The button
+placement for New Search and Quit is irregular. 
+.SH SEE ALSO
+.B dtfile(1) dtpad(1) dtterm(1) locate(1) updatedb(8) 

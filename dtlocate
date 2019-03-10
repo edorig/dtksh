@@ -1,0 +1,80 @@
+#! /usr/dt/bin/dtksh
+
+dosearch()
+{
+    # File or directory name to search 
+    XmTextGetString z $TEXT0
+    CMD="locate"
+    # Ignore case button is on 
+    if $(XmToggleButtonGetState $BUTTON0); then CMD=$CMD" -i" 
+    fi
+    # Basename search button is on
+    if $(XmToggleButtonGetState $BUTTON1); then CMD=$CMD" -b" 
+    fi
+    # Ignore accents button is on 
+    if  $(XmToggleButtonGetState $BUTTON2); then CMD=$CMD" -t" 
+    fi
+    
+    a=`$CMD $z`
+    
+    
+    
+    
+    
+   
+    if [[ $? -eq 0 ]];  then 
+# We test the return value of locate to be sure that at least 1 file was found.     
+     
+    j=0 
+    for i in $a;do
+	j=$((j+1))
+	XmListAddItemUnselected $LIST1 $j $i; done; 
+    else XmListAddItemUnselected $LIST1 1 "No File !";
+    fi
+    XtUnmanageChild $LABEL0
+    XtUnmanageChild $TEXT0
+    XtUnmanageChild $CHECK
+    XtManageChild $BUTTON3
+    XtManageChild $BUTTON4
+    XtManageChild $LIST1	 
+}
+
+newsearch()
+{   XmListDeleteAllItems $LIST1 
+    XtUnmanageChild $LIST1
+    XtUnmanageChild $BUTTON3
+    XtUnmanageChild $BUTTON4
+    XtManageChild $LABEL0
+    XtManageChild $TEXT0
+    XtManageChild $CHECK 
+}
+
+XtInitialize TOPLEVEL text TExt "$0" "$@"
+
+XtCreateManagedWidget FORM form XmForm $TOPLEVEL \
+    marginHeight:15 \
+    marginWidth:15
+
+XmCreateRowColumn RW0 $FORM rw0 numColumns:2 orientation:HORIZONTAL packing:PACK_COLUMN
+
+#XmCreateText TEXT0 $FORM text0 
+XmCreateLabel LABEL0 $RW0 label0 labelString:"File to search" 
+XmCreateTextField TEXT0 $RW0 text0 activateCallback:dosearch
+XmCreateRowColumn CHECK $FORM check orientation:VERTICAL topAttachment:ATTACH_WIDGET topWidget:$RW0
+XmCreateToggleButton BUTTON0 $CHECK button0 labelString:"Ignore case"
+XmCreateToggleButton BUTTON1 $CHECK button1 labelString:"Basename search"
+XmCreateToggleButton BUTTON2 $CHECK button2 labelString:"Ignore accents"
+XmCreateScrolledList LIST1 $FORM "Found" selectionPolicy:SINGLE_SELECT visibleItemCount:10 scrollBarDisplayPolicy:STATIC 
+XmCreatePushButton BUTTON3 $FORM button3 labelString:"New Search" activateCallback:newsearch topAttachment:ATTACH_WIDGET topWidget:$LIST1
+XmCreatePushButton BUTTON4 $FORM button4 labelString:"Quit" activateCallback:"exit" bottomAttachment:ATTACH_FORM
+XtManageChild $RW0
+XtManageChild $LABEL0
+XtManageChild $TEXT0
+XtManageChild $CHECK
+XtManageChild $BUTTON0
+XtManageChild $BUTTON1
+XtManageChild $BUTTON2
+#XtManageChild $LABEL1
+XtRealizeWidget $TOPLEVEL
+XtMainLoop
+

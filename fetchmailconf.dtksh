@@ -1,0 +1,115 @@
+#! /usr/dt/bin/dtksh
+# Some of these functions are incomplete.
+# KPOP should ask extra info on Kerberos setup. 
+
+auto() protocol="AUTO";
+pop2() protocol="POP2";
+pop3() protocol='POP3';
+apop() protocol="APOP";
+rpop() protocol="RPOP";
+kpop() protocol="KPOP";
+sdps() protocol="SDPS";
+imap() protocol="IMAP";
+etrn() protocol="ETRN";
+odmr() protocol="ODMR";
+output(){
+    
+    XtGetValues $TEXT1 value:server
+    XtGetValues $TEXT2 value:locname
+    XtGetValues $TEXT3 value:rname
+    XtGetValues $TEXT4 value:pwd
+#    if [[ -e $HOME/.fetchmailrc ]]; mv $HOME/.fetchmailrc $HOME/.fetchmailrc.OLD;
+#    fi
+    echo -n "poll" $server > $HOME/.fetchmailrc 
+    echo " with proto" $protocol >> $HOME/.fetchmailrc 
+    echo -n "user '"$rname  >> $HOME/.fetchmailrc
+    echo -n "' there with password '"$pwd"'"  >> $HOME/.fetchmailrc
+    if [[ ssl -ge 2 ]]; then echo -n " ssl "  >> $HOME/.fetchmailrc; 
+    fi 
+    if [[ ssl -gt 0 ]]; then echo -n " sslproto auto sslcertck " >> $HOME/.fetchmailrc; 
+    fi
+       
+    echo "is '"$locname"' here keep"  >> $HOME/.fetchmailrc
+
+    }
+
+plain() ssl=0; 
+starttls() ssl=1; 
+ssl() ssl=2;  
+
+XtInitialize TOPLEVEL fetchmail Fetchmail "$0" "$@"
+
+XtCreateManagedWidget FORM form XmRowColumn $TOPLEVEL numColumns:6
+
+#We create first the pulldown menu
+XmCreatePulldownMenu TRUC $FORM protmenu numColumns:10
+
+# All the protocols supported by fetchmail(1) have a button
+# in the pulldown menu
+XmCreatePushButton BUTTON1 $TRUC "AUTO" activateCallback:auto
+XmCreatePushButton BUTTON2 $TRUC "POP2" activateCallback:pop2
+XmCreatePushButton BUTTON3 $TRUC "POP3" activateCallback:pop3
+XmCreatePushButton BUTTON4 $TRUC "APOP" activateCallback:apop
+XmCreatePushButton BUTTON5 $TRUC "RPOP" activateCallback:rpop
+XmCreatePushButton BUTTON6 $TRUC "KPOP" activateCallback:kpop
+XmCreatePushButton BUTTON7 $TRUC "SDPS" activateCallback:sdps
+XmCreatePushButton BUTTON8 $TRUC "IMAP" activateCallback:imap
+XmCreatePushButton BUTTON9 $TRUC "ETRN" activateCallback:etrn
+XmCreatePushButton BUTTON10 $TRUC "ODMR" activateCallback:odmr
+# Now we attach the pulldown menu to an option menu. Default option will be
+# AUTO
+XmCreateOptionMenu MENU $FORM protbutton numColumns:10 labelString:"Protocol" subMenuId:$TRUC
+# Text entry fields for server name, local/remote usernames and passwords
+XmCreateLabel LABEL1 $FORM "Server name"
+XmCreateText TEXT1 $FORM text1 
+XmCreateLabel LABEL2 $FORM "Local username"
+XmCreateText TEXT2 $FORM text2 value:`whoami` 
+XmCreateLabel LABEL3 $FORM "Remote username"
+XmCreateText TEXT3 $FORM text3 
+XmCreateLabel LABEL4 $FORM "Remote password" 
+XmCreateText TEXT4 $FORM text4
+# Pick SSL options between 3 mutually exclusive choice
+# 
+# 
+XmCreateLabel LABEL5 $FORM "SSL Options" 
+XmCreateRadioBox SSL $FORM sslopt 
+XmCreateToggleButton SSL1 $SSL "No encryption" armCallback:plain
+XmCreateToggleButton SSL2 $SSL "StartTLS only" armCallback:starttls
+XmCreateToggleButton SSL3 $SSL "SSL" armCallback:ssl
+XmCreateSeparator SEPARATOR $FORM separatiste
+XmCreatePushButton BUTTON11 $FORM "Done" activateCallback:output 
+XmCreatePushButton BUTTON12 $FORM "Quit" activateCallback:exit
+                       
+protocol="AUTO"                         
+# This is necessary when we don't use XtCreateManagedWidget
+XtManageChild $TRUC
+XtManageChild $BUTTON1
+XtManageChild $BUTTON2
+XtManageChild $BUTTON3
+XtManageChild $BUTTON4
+XtManageChild $BUTTON5
+XtManageChild $BUTTON6
+XtManageChild $BUTTON7
+XtManageChild $BUTTON8
+XtManageChild $BUTTON9
+XtManageChild $BUTTON10
+XtManageChild $LABEL1
+XtManageChild $TEXT1
+XtManageChild $LABEL2
+XtManageChild $TEXT2
+XtManageChild $LABEL3
+XtManageChild $TEXT3
+XtManageChild $LABEL4
+XtManageChild $TEXT4
+XtManageChild $MENU
+XtManageChild $LABEL5
+XtManageChild $SSL
+XtManageChild $SSL1
+XtManageChild $SSL2
+XtManageChild $SSL3
+XtManageChild $SEPARATOR
+XtManageChild $BUTTON11
+XtManageChild $BUTTON12
+XtRealizeWidget $TOPLEVEL
+XtMainLoop
+

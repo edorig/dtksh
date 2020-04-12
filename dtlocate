@@ -56,21 +56,21 @@ newsearch()
 XtInitialize TOPLEVEL text TExt "$0" "$@"
 
 XtCreateManagedWidget FORM form XmForm $TOPLEVEL \
-    marginHeight:15 \
-    marginWidth:15
+    marginHeight:5 \
+    marginWidth:5
 
-XmCreateRowColumn RW0 $FORM rw0 numColumns:2 orientation:HORIZONTAL packing:PACK_COLUMN topAttachment:ATTACH_WIDGET topWidget:$FORM
+XmCreateRowColumn RW0 $FORM rw0 numColumns:2 orientation:HORIZONTAL packing:PACK_COLUMN topAttachment:ATTACH_FORM leftAttachment:ATTACH_FORM  
 
 #XmCreateText TEXT0 $FORM text0 
 XmCreateLabel LABEL0 $RW0 label0 labelString:"File to search" 
-XmCreateTextField TEXT0 $RW0 text0 activateCallback:dosearch
-XmCreateRowColumn CHECK $FORM check orientation:VERTICAL topAttachment:ATTACH_WIDGET topWidget:$RW0
+XmCreateTextField TEXT0 $RW0 text0 activateCallback:dosearch 
+XmCreateRowColumn CHECK $FORM check orientation:VERTICAL bottomAttachment:ATTACH_FORM leftAttachment:ATTACH_FORM numColumns:3
 XmCreateToggleButton BUTTON0 $CHECK button0 labelString:"Ignore case"
 XmCreateToggleButton BUTTON1 $CHECK button1 labelString:"Basename search"
 XmCreateToggleButton BUTTON2 $CHECK button2 labelString:"Ignore accents"
 XmCreateScrolledList LIST1 $FORM "Found" selectionPolicy:SINGLE_SELECT visibleItemCount:10 scrollBarDisplayPolicy:STATIC 
-XmCreatePushButton BUTTON3 $FORM button3 labelString:"New Search" activateCallback:newsearch topAttachment:ATTACH_WIDGET topWidget:$LIST1
-XmCreatePushButton BUTTON4 $FORM button4 labelString:"Quit" activateCallback:"exit" bottomAttachment:ATTACH_FORM
+XmCreatePushButton BUTTON3 $FORM button3 labelString:"New Search" activateCallback:newsearch bottomAttachment:ATTACH_FORM leftAttachment:ATTACH_FORM
+XmCreatePushButton BUTTON4 $FORM button4 labelString:"Quit" activateCallback:"exit" bottomAttachment:ATTACH_FORM rightAttachment:ATTACH_FORM
 XtManageChild $RW0
 XtManageChild $LABEL0
 XtManageChild $TEXT0

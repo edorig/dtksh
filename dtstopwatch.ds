@@ -1,0 +1,51 @@
+XtInitialize TOPLEVEL dtchrono Dtchrono "$0" "$@"
+
+startchrono() {
+#    echo "Chronometer started"
+    if [[ $started == 0 ]] ; then XtAddTimeOut CHRONO 100 "update;"
+			       started=1
+    fi
+}
+
+stopchrono(){
+#    echo "Chronometer stopped"
+    XtRemoveTimeOut $CHRONO
+    started=0 
+}
+
+update(){
+    # Change the decimal point to a comma in non C/US/UK locale if needed 
+    z=$((z+0.1))
+    XmTextSetString $TEXT1 $z
+    XtAddTimeOut $CHRONO 100 "update;" 
+    }
+raz()
+{
+if [[ $started == 0 ]] ; then z=0
+			      XmTextSetString $TEXT1 $z
+fi
+} 
+# initializations
+typeset -F 1 z
+z=0
+started=0 
+
+XtCreateManagedWidget FORM form XmForm $TOPLEVEL \
+    marginHeight:15 \
+    marginWidth:15 \
+    width:230 \
+    height:110 
+XmCreatePushButton BUTTON1 $FORM button1 labelString:"Start" topAttachment:ATTACH_FORM leftAttachment:ATTACH_FORM activateCallback:startchrono
+
+XmCreatePushButton BUTTON2 $FORM button2 labelString:"Stop" topAttachment:ATTACH_FORM rightAttachment:ATTACH_FORM activateCallback:stopchrono
+
+XmCreatePushButton BUTTON3 $FORM button3 labelString:"Reset" topAttachment:ATTACH_FORM rightAttachment:ATTACH_WIDGET rightWidget:$BUTTON2 activateCallback:raz  
+XmCreateTextField TEXT1 $FORM text1 bottomAttachment:ATTACH_FORM leftAttachment:ATTACH_FORM editable:FALSE value:$z
+
+XtManageChild $BUTTON1
+XtManageChild $BUTTON2
+XtManageChild $BUTTON3
+XtManageChild $TEXT1
+
+XtRealizeWidget $TOPLEVEL
+XtMainLoop

@@ -1,0 +1,134 @@
+#!/usr/dt/bin/dtksh -f
+
+test_ok() {
+# A zip file has been selected. We get its name from callback data.
+# we use unzip to find its content, that we insert at the top of the text field.
+    zipfile=${CB_CALL_DATA.VALUE}
+    XmTextGetLastPosition zz $TEXT1
+    content=`unzip -l $zipfile`
+    XmTextReplace $TEXT1 0 $zz "$content"
+    XmTextSetString $EX_DIR `dirname $zipfile` 
+    XtUnmanageChild $BOX
+    }
+
+quit() {
+echo "Fin du programme" 
+exit 0 
+}
+
+ask_file()
+{
+    XtManageChild $BOX
+    } 
+ask_opts()
+{
+    XtManageChild $EXTRACT
+    XtManageChild $EX_DIR 
+    XtManageChild $EX_OPTIONS
+    XtManageChild $FRESHEN
+    XtManageChild $OVERWRITE
+    XtManageChild $KEEP
+    XtManageChild $CRLF_OPTIONS
+    XtManageChild $ASCII
+    XtManageChild $BINARY 
+    XtManageChild $ExtrButton
+    XtManageChild $CancelButton
+    
+    }
+
+do_extract() {
+    #We are ready to extract the files. First, let's see what the user wants.
+    # User wants only files older than those in zip file overwritten
+     if $(XmToggleButtonGetState $FRESHEN); then ex_opt=" -u" 
+    fi
+    # User wants all files overwritten
+    if $(XmToggleButtonGetState $OVERWRITE); then ex_opt=" -o" 
+    fi
+    # User does not want any file overwritten 
+    if  $(XmToggleButtonGetState $KEEP); then ex_opt=" -n" 
+    fi
+    # CR/LF conversion options
+     
+    if $(XmToggleButtonGetState $ASCII); then ex_opt=$ex_opt" -a"
+    fi
+    
+    unzip" $ex_opt -d `dirname $zipfile` $zipfile
+# We don't need anymore the extraction menu, so we unmanage it 
+    XtUnmanageChild $EXTRACT
+    XtUnmanageChild $EX_DIR
+    XtUnmanageChild $EX_OPTIONS
+    XtUnmanageChild $FRESHEN
+    XtUnmanageChild $OVERWRITE
+    XtUnmanageChild $KEEP
+    XtUnmanageChild $CRLF_OPTIONS
+    XtUnmanageChild $ASCII
+    XtUnmanageChild $BINARY 
+    XtUnmanageChild $ExtrButton
+    XtUnmanageChild $CancelButton 
+}
+
+cancel_extract()
+{
+# We don't need anymore the extraction menu, so we unmanage it 
+    XtUnmanageChild $EXTRACT
+    XtUnmanageChild $EXDIR 
+    XtUnmanageChild $EX_OPTIONS
+    XtUnmanageChild $FRESHEN
+    XtUnmanageChild $OVERWRITE
+    XtUnmanageChild $KEEP
+    XtUnmanageChild $CRLF_OPTIONS
+    XtUnmanageChild $ASCII
+    XtUnmanageChild $BINARY 
+    XtUnmanageChild $ExtrButton
+    XtUnmanageChild $CancelButton 
+}
+
+XtInitialize TOPLEVEL text TExt "$0" "$@"
+
+
+
+XmCreatePanedWindow PANE $TOPLEVEL pane
+XmCreateScrolledWindow SCROLL $PANE scroll scrollBarPlacement:TOP_LEFT scrollingPolicy:AUTOMATIC height:400 width:600
+
+XmCreateFileSelectionDialog BOX $SCROLL box pattern:"*.[Zz][Ii][Pp]" 
+XtAddCallback $BOX okCallback "test_ok"
+XtAddCallback $BOX cancelCallback "quit" 
+
+
+XmCreateText TEXT1 $SCROLL "Content" scrollVertical:True scrollLeftSide:True editable:False value:"No ZIP file yet"
+
+
+# Button for Extracting/Opening files 
+XmCreatePushButton BUTTON1 $PANE button1 labelString:"Open File..." activateCallback:ask_file 
+XmCreatePushButton BUTTON2 $PANE button2 labelString:"Extract" activateCallback:ask_opts
+XmCreatePushButton BUTTON3 $PANE button3 labelString:"Quit" activateCallback:quit
+
+
+
+
+
+# Ceci est indispensable si on ne se sert pas de XtCreateManagedWidget
+XtManageChild $PANE
+XtManageChild $SCROLL
+XtManageChild $TEXT1
+XtManageChild $BUTTON1
+XtManageChild $BUTTON2
+XtManageChild $BUTTON3
+#XtManageChild $BOX
+
+
+# Dialog for archive extraction 
+XmCreateFormDialog EXTRACT $TOPLEVEL extraction
+XmCreateTextField EX_DIR $EXTRACT ex_dir topAttachment:ATTACH_FORM value:$PWD 
+XmCreateRadioBox EX_OPTIONS $EXTRACT ex_options topAttachment:ATTACH_WIDGET topWidget:$EX_DIR 
+XmCreateToggleButton FRESHEN $EX_OPTIONS freshen labelString:"Overwrite old files" set:UNSET
+XmCreateToggleButton OVERWRITE $EX_OPTIONS overwrite labelString:"Overwrite all files" set:UNSET
+XmCreateToggleButton KEEP $EX_OPTIONS keep labelString:"Never overwrite files" set:SET
+XmCreateRadioBox CRLF_OPTIONS $EXTRACT crlf_options topAttachment:ATTACH_WIDGET topWidget:$EX_OPTIONS 
+XmCreateToggleButton ASCII $CRLF_OPTIONS ascii labelString:"Convert Text Files" set:UNSET
+XmCreateToggleButton BINARY $CRLF_OPTIONS binary labelString:"Don't Convert" set:SET
+XmCreatePushButton ExtrButton $EXTRACT extrok labelString:"OK"  topAttachment:ATTACH_WIDGET topWidget:$CRLF_OPTIONS leftAttachment:ATTACH_FORM activateCallback:do_extract
+XmCreatePushButton CancelButton $EXTRACT extrcancel labelString:"Cancel" topAttachment:ATTACH_WIDGET topWidget:$CRLF_OPTIONS rightAttachment:ATTACH_FORM activateCallback:cancel_extract  
+
+XtRealizeWidget $TOPLEVEL
+XtMainLoop

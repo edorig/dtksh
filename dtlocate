@@ -39,7 +39,8 @@ dosearch()
     XtUnmanageChild $CHECK
     XtManageChild $BUTTON3
     XtManageChild $BUTTON4
-    XtManageChild $LIST1	 
+    XtManageChild $LIST1
+
 }
 
 newsearch()
@@ -68,7 +69,8 @@ XmCreateRowColumn CHECK $FORM check orientation:VERTICAL bottomAttachment:ATTACH
 XmCreateToggleButton BUTTON0 $CHECK button0 labelString:"Ignore case"
 XmCreateToggleButton BUTTON1 $CHECK button1 labelString:"Basename search"
 XmCreateToggleButton BUTTON2 $CHECK button2 labelString:"Ignore accents"
-XmCreateScrolledList LIST1 $FORM "Found" selectionPolicy:SINGLE_SELECT visibleItemCount:10 scrollBarDisplayPolicy:STATIC 
+XmCreateScrolledList LIST1 $FORM list1  selectionPolicy:SINGLE_SELECT visibleItemCount:10 scrollBarDisplayPolicy:STATIC
+XmCreateScrollBar BAR1 $LIST1 bar1  
 XmCreatePushButton BUTTON3 $FORM button3 labelString:"New Search" activateCallback:newsearch bottomAttachment:ATTACH_FORM leftAttachment:ATTACH_FORM
 XmCreatePushButton BUTTON4 $FORM button4 labelString:"Quit" activateCallback:"exit" bottomAttachment:ATTACH_FORM rightAttachment:ATTACH_FORM
 XtManageChild $RW0
